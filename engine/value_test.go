@@ -25,6 +25,40 @@ func TestValue_Mul(t *testing.T) {
 	}
 }
 
+func TestValue_Div(t *testing.T) {
+	a := engine.NewValue(2)
+	b := engine.NewValue(3)
+	result := a.Div(b)
+	result.Backward()
+
+	if result.Data() != 0.6666667 {
+		t.Error("Expected 0.6666667, got ", result.Data())
+	}
+	if a.Grad() != 0.33333334 {
+		t.Error("Expected 0.33333334, got ", a.Grad())
+	}
+	if b.Grad() != -0.22222222 {
+		t.Error("Expected -0.22222222, got ", b.Grad())
+	}
+}
+
+func TestValue_Sub(t *testing.T) {
+	a := engine.NewValue(2)
+	b := engine.NewValue(3)
+	result := a.Sub(b)
+	result.Backward()
+
+	if result.Data() != -1 {
+		t.Error("Expected -1, got ", result.Data())
+	}
+	if a.Grad() != 1 {
+		t.Error("Expected 1, got ", a.Grad())
+	}
+	if b.Grad() != -1 {
+		t.Error("Expected -1, got ", b.Grad())
+	}
+}
+
 func TestValue_Backward(t *testing.T) {
 	x1 := engine.NewValue(2)
 	x2 := engine.NewValue(0)
