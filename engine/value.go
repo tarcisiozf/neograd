@@ -45,6 +45,8 @@ func (v *Value) Mul(other *Value) *Value {
 	return out
 }
 
+// TODO: add ReLU
+
 func (v *Value) Tanh() *Value {
 	t := math.Tanh(float64(v.data))
 	out := NewValue(float32(t), v)

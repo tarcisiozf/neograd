@@ -1,7 +1,6 @@
 package neuralnet
 
 import (
-	"math/rand"
 	"neograd/engine"
 )
 
@@ -14,9 +13,9 @@ type Neuron struct {
 func NewNeuron(numInputs int) *Neuron {
 	weights := make([]*engine.Value, numInputs)
 	for i := 0; i < numInputs; i++ {
-		weights[i] = engine.NewValue(rand.Float32())
+		weights[i] = engine.NewValue(engine.RandomUniform(-1, 1))
 	}
-	bias := engine.NewValue(rand.Float32())
+	bias := engine.NewValue(engine.RandomUniform(-1, 1))
 	return &Neuron{
 		bias:    bias,
 		weights: weights,
