@@ -31,3 +31,8 @@ func (n *Neuron) Call(inputs []*engine.Value) *engine.Value {
 	}
 	return activation.Tanh()
 }
+
+// TODO: use iterators
+func (n *Neuron) Parameters() []*engine.Value {
+	return append([]*engine.Value{n.bias}, n.weights...)
+}

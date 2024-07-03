@@ -22,4 +22,7 @@ func TestMultiLayerPerceptron_Call(t *testing.T) {
 	if result[0] == nil {
 		t.Error("Expected non-nil result, got ", result[0])
 	}
+	if len(mlp.Parameters()) != 41 {
+		t.Error("Expected 41 parameters, got ", len(mlp.Parameters()))
+	}
 }

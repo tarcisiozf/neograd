@@ -5,6 +5,12 @@ import (
 	"math"
 )
 
+type ValueList []*Value
+
+func (v ValueList) Item() *Value {
+	return v[0]
+}
+
 type Value struct {
 	data     float32
 	prev     []*Value
@@ -103,4 +109,12 @@ func (v *Value) Label(label string) *Value {
 
 func (v *Value) Grad() float32 {
 	return v.grad
+}
+
+func (v *Value) Adjust(amount float32) {
+	v.data += amount
+}
+
+func (v *Value) ZeroGrad() {
+	v.grad = 0
 }
