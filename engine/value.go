@@ -5,12 +5,6 @@ import (
 	"math"
 )
 
-type ValueList []*Value
-
-func (v ValueList) Item() *Value {
-	return v[0]
-}
-
 type Value struct {
 	data     float32
 	prev     []*Value
