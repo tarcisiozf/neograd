@@ -22,7 +22,7 @@ func NewNeuron(numInputs int) *Neuron {
 	}
 }
 
-// w * x + b
+// f(w * x + b)
 func (n *Neuron) Call(inputs []*engine.Value) *engine.Value {
 	activation := n.bias
 	for i, w := range n.weights {
