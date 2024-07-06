@@ -39,7 +39,21 @@ func (v *Value) Mul(other *Value) *Value {
 	return out
 }
 
-// TODO: add ReLU
+func (v *Value) ReLU() *Value {
+	x := v.data
+	if x < 0 {
+		x = 0
+	}
+	out := NewValue(x, v)
+
+	v.backward = func() {
+		if out.data > 0 {
+			v.grad += out.data * out.grad
+		}
+	}
+
+	return out
+}
 
 func (v *Value) Tanh() *Value {
 	t := math.Tanh(float64(v.data))
