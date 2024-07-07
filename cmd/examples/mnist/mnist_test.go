@@ -1,4 +1,4 @@
-package mnist
+package main
 
 import (
 	"neograd/engine"
