@@ -3,7 +3,8 @@ package neuralnet
 import "neograd/engine"
 
 type Layer struct {
-	neurons []*Neuron
+	neurons   []*Neuron
+	activator engine.ActivationFunction
 }
 
 func NewLayer(numInputs, numOutputs int) *Layer {
@@ -17,10 +18,15 @@ func NewLayer(numInputs, numOutputs int) *Layer {
 	}
 }
 
+func (l *Layer) Activation(activator engine.ActivationFunction) *Layer {
+	l.activator = activator
+	return l
+}
+
 func (l *Layer) Call(inputs []*engine.Value) []*engine.Value {
 	out := make([]*engine.Value, len(l.neurons))
 	for i, neuron := range l.neurons {
-		out[i] = neuron.Call(inputs)
+		out[i] = l.activator(neuron.Call(inputs))
 	}
 	return out
 }

@@ -26,14 +26,18 @@ type MultiLayerPerceptron struct {
 }
 
 func NewMultiLayerPerceptron(inputs ...int) *MultiLayerPerceptron {
-	layers := make([]*Layer, len(inputs)-1)
+	layers := make([]*Layer, 0)
 	for i := 0; i < len(inputs)-1; i++ {
-		layers[i] = NewLayer(inputs[i], inputs[i+1])
+		layers = append(layers, NewLayer(inputs[i], inputs[i+1]))
 	}
 
 	return &MultiLayerPerceptron{
 		layers: layers,
 	}
+}
+
+func (m *MultiLayerPerceptron) Add(layer *Layer) {
+	m.layers = append(m.layers, layer)
 }
 
 func (m *MultiLayerPerceptron) Call(input []*engine.Value) engine.ValueList {
@@ -94,4 +98,11 @@ func (m *MultiLayerPerceptron) Parameters() []*engine.Value {
 		params = append(params, layer.Parameters()...)
 	}
 	return params
+}
+
+func (m *MultiLayerPerceptron) Activation(activator engine.ActivationFunction) *MultiLayerPerceptron {
+	for _, layer := range m.layers {
+		layer.Activation(activator)
+	}
+	return m
 }

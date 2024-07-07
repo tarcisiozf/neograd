@@ -20,7 +20,7 @@ func main() {
 		engine.NewValue(1),
 	}
 
-	mlp := neuralnet.NewMultiLayerPerceptron(len(inputs[0]), 4, 4, 1)
+	mlp := neuralnet.NewMultiLayerPerceptron(len(inputs[0]), 4, 4, 1).Activation(engine.Tanh)
 
 	predictions := make([]*engine.Value, len(inputs))
 

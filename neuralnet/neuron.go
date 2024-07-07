@@ -28,7 +28,7 @@ func (n *Neuron) Call(inputs []*engine.Value) *engine.Value {
 	for i, w := range n.weights {
 		activation = activation.Add(inputs[i].Mul(w))
 	}
-	return activation.Tanh()
+	return activation
 }
 
 // TODO: use iterators

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"neograd/engine"
-	"neograd/neuralnet"
+	nn "neograd/neuralnet"
 )
 
 func main() {
@@ -20,7 +20,10 @@ func main() {
 		engine.NewValue(1),
 	}
 
-	mlp := neuralnet.NewMultiLayerPerceptron(28*28, 800, 10, 1)
+	mlp := nn.NewMultiLayerPerceptron()
+	mlp.Add(nn.NewLayer(28*28, 800).Activation(engine.ReLU))
+	mlp.Add(nn.NewLayer(800, 10).Activation(engine.ReLU))
+	mlp.Add(nn.NewLayer(10, 1).Activation(engine.Softmax))
 
 	predictions := make([]*engine.Value, len(inputs))
 
@@ -31,7 +34,7 @@ func main() {
 			predictions[i] = mlp.Call(input).Item()
 		}
 
-		loss := neuralnet.MeanSquaredError(desiredTargets, predictions).Label("loss")
+		loss := nn.MeanSquaredError(desiredTargets, predictions).Label("loss")
 
 		// backward pass
 		for _, param := range mlp.Parameters() {
