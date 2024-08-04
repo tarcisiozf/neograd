@@ -28,5 +28,5 @@ func calcFlops(inputs ...int) {
 
 func main() {
 	calcFlops(2, 3, 2, 1)
-	calcFlops(28*28, 800, 10, 1)
+	calcFlops(28*28, 800, 10)
 }
