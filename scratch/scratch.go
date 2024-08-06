@@ -320,7 +320,8 @@ func main() {
 		X = append(X, pixels)
 	}
 
-	X = transpose(X)
+	X = transpose(X[:1000])
+	Y = Y[:1000]
 
 	w1, b1, w2, b2 := gradientDescent(X, Y, 100, 0.1)
 	_, _, _, a2 := forwardProp(w1, b1, w2, b2, X)
