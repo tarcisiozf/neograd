@@ -85,12 +85,30 @@ func ReLU(a [][]float32) [][]float32 {
 func softmax(a [][]float32) [][]float32 {
 	rows, cols := len(a), len(a[0])
 	c := make([][]float32, rows)
+
 	for i := range c {
 		c[i] = make([]float32, cols)
+		// Step 1: Find the maximum value in the row
+		maxVal := a[i][0]
+		for j := 1; j < cols; j++ {
+			if a[i][j] > maxVal {
+				maxVal = a[i][j]
+			}
+		}
+
+		// Step 2: Subtract the maximum value from each element and compute the exponent
+		sumExp := float32(0)
 		for j := range c[i] {
-			c[i][j] = float32(math.Exp(float64(a[i][j]))) // TODO: wrong
+			c[i][j] = float32(math.Exp(float64(a[i][j] - maxVal)))
+			sumExp += c[i][j]
+		}
+
+		// Step 3: Normalize by dividing each exponent by the sum of exponents
+		for j := range c[i] {
+			c[i][j] /= sumExp
 		}
 	}
+
 	return c
 }
 
