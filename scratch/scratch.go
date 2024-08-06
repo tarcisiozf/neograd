@@ -235,9 +235,9 @@ func sub(a [][]float32, b [][]float32) [][]float32 {
 
 func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 [][]float32, learningRate float32) ([][]float32, [][]float32, [][]float32, [][]float32) {
 	w1 = sub(w1, mulf(learningRate, dw1))
-	b1 = sub(b1, mulf(learningRate, db1))
+	b1 = sub(b1, transpose(mulf(learningRate, db1)))
 	w2 = sub(w2, mulf(learningRate, dw2))
-	b2 = sub(b2, mulf(learningRate, db2))
+	b2 = sub(b2, transpose(mulf(learningRate, db2)))
 	return w1, b1, w2, b2
 }
 
@@ -256,7 +256,7 @@ func gradientDescent(X, Y [][]float32, iterations int, learningRate float32) {
 }
 
 func main() {
-	data := make([][]float32, 5)
+	data := make([][]float32, 10)
 	for i := range data {
 		data[i] = make([]float32, 784)
 		for j := range data[i] {
@@ -265,12 +265,9 @@ func main() {
 	}
 
 	X := transpose(data)
-	Y := [][]float32{
-		{1},
-		{2},
-		{3},
-		{4},
-		{5},
+	Y := make([][]float32, 10)
+	for i := 0; i < 10; i++ {
+		Y[i] = []float32{float32(i)}
 	}
 
 	gradientDescent(X, Y, 100, 0.1)
