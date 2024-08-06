@@ -3,6 +3,9 @@ package main
 import (
 	"math"
 	"neograd/engine"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func randn(rows, cols int) [][]float32 {
@@ -216,16 +219,36 @@ func sum(a [][]float32, dim int) [][]float32 {
 	return c
 }
 
+func padzero(a [][]float32, rows, cols int) [][]float32 {
+	c := make([][]float32, rows)
+	for i := range c {
+		if i < len(a) {
+			c[i] = make([]float32, cols)
+			for j := range c[i] {
+				c[i][j] = a[i][j]
+			}
+		} else {
+			c[i] = make([]float32, cols)
+		}
+	}
+	return c
+}
+
 func sub(a [][]float32, b [][]float32) [][]float32 {
 	rowsA, colsA := len(a), len(a[0])
 	rowsB, colsB := len(b), len(b[0])
 	if rowsA != rowsB || colsA != colsB {
-		panic("matrix dimensions do not match")
+		if colsA == 1 && rowsB == 1 {
+			a = broadcast(a, rowsA, colsB)
+			b = padzero(b, rowsA, colsB)
+		} else {
+			panic("matrix dimensions do not match")
+		}
 	}
 
 	c := make([][]float32, rowsA)
 	for i := range c {
-		c[i] = make([]float32, colsA)
+		c[i] = make([]float32, colsB)
 		for j := range c[i] {
 			c[i][j] = a[i][j] - b[i][j]
 		}
@@ -235,9 +258,9 @@ func sub(a [][]float32, b [][]float32) [][]float32 {
 
 func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 [][]float32, learningRate float32) ([][]float32, [][]float32, [][]float32, [][]float32) {
 	w1 = sub(w1, mulf(learningRate, dw1))
-	b1 = sub(b1, transpose(mulf(learningRate, db1)))
+	b1 = sub(b1, mulf(learningRate, db1))
 	w2 = sub(w2, mulf(learningRate, dw2))
-	b2 = sub(b2, transpose(mulf(learningRate, db2)))
+	b2 = sub(b2, mulf(learningRate, db2))
 	return w1, b1, w2, b2
 }
 
@@ -252,25 +275,39 @@ func gradientDescent(X, Y [][]float32, iterations int, learningRate float32) ([]
 		z1, a1, z2, a2 := forwardProp(w1, b1, w2, b2, X)
 		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, X, Y)
 		w1, b1, w2, b2 = updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2, learningRate)
+		println(i)
 	}
 
 	return w1, b1, w2, b2
 }
 
 func main() {
-	data := make([][]float32, 10)
-	for i := range data {
-		data[i] = make([]float32, 784)
-		for j := range data[i] {
-			data[i][j] = engine.RandomUniform(-1, 1)
+	var X, Y [][]float32
+
+	file, err := os.ReadFile("./scratch/train.csv")
+	if err != nil {
+		panic(err)
+	}
+	csv := strings.Split(string(file), "\n")
+	for _, row := range csv[1:] {
+		if row == "" {
+			continue
 		}
+		cols := strings.Split(row, ",")
+		label, err := strconv.Atoi(cols[0])
+		if err != nil {
+			panic(err)
+		}
+		Y = append(Y, []float32{float32(label)})
+		pixels := make([]float32, 784)
+		for i, col := range cols[1:] {
+			p := col[0] - '0'
+			pixels[i] = float32(p)
+		}
+		X = append(X, pixels)
 	}
 
-	X := transpose(data)
-	Y := make([][]float32, 10)
-	for i := 0; i < 10; i++ {
-		Y[i] = []float32{float32(i)}
-	}
+	X = transpose(X)
 
 	w1, b1, w2, b2 := gradientDescent(X, Y, 100, 0.1)
 	_, _, _, a2 := forwardProp(w1, b1, w2, b2, X)
