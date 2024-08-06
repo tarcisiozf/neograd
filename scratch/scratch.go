@@ -241,7 +241,7 @@ func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 [][]float32, learningRate f
 	return w1, b1, w2, b2
 }
 
-func gradientDescent(X, Y [][]float32, iterations int, learningRate float32) {
+func gradientDescent(X, Y [][]float32, iterations int, learningRate float32) ([][]float32, [][]float32, [][]float32, [][]float32) {
 	// init params:
 	w1 := randn(10, 784)
 	b1 := randn(10, 1)
@@ -253,6 +253,8 @@ func gradientDescent(X, Y [][]float32, iterations int, learningRate float32) {
 		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, X, Y)
 		w1, b1, w2, b2 = updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2, learningRate)
 	}
+
+	return w1, b1, w2, b2
 }
 
 func main() {
@@ -270,5 +272,8 @@ func main() {
 		Y[i] = []float32{float32(i)}
 	}
 
-	gradientDescent(X, Y, 100, 0.1)
+	w1, b1, w2, b2 := gradientDescent(X, Y, 100, 0.1)
+	_, _, _, a2 := forwardProp(w1, b1, w2, b2, X)
+
+	println(a2)
 }
