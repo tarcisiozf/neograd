@@ -234,6 +234,17 @@ func padzero(a [][]float32, rows, cols int) [][]float32 {
 	return c
 }
 
+func broadcastDown(a [][]float32, rows, cols int) [][]float32 {
+	c := make([][]float32, rows)
+	for i := range c {
+		c[i] = make([]float32, cols)
+		for j := range c[i] {
+			c[i][j] = a[0][j]
+		}
+	}
+	return c
+}
+
 func sub(a [][]float32, b [][]float32) [][]float32 {
 	rowsA, colsA := len(a), len(a[0])
 	rowsB, colsB := len(b), len(b[0])
@@ -241,6 +252,8 @@ func sub(a [][]float32, b [][]float32) [][]float32 {
 		if colsA == 1 && rowsB == 1 {
 			a = broadcast(a, rowsA, colsB)
 			b = padzero(b, rowsA, colsB)
+		} else if rowsB == 1 && colsB > 1 {
+			b = broadcastDown(b, rowsA, colsB)
 		} else {
 			panic("matrix dimensions do not match")
 		}
