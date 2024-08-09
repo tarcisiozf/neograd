@@ -55,13 +55,26 @@ func main() {
 }
 
 func decode(ids []int, vocab map[int][]int) string {
-	tokens := make([]byte, 0)
-	for _, id := range ids {
-		for _, b := range vocab[id] {
-			tokens = append(tokens, byte(b))
+	var tokens []int
+	prevLen := len(ids)
+	for {
+		tokens = make([]int, 0)
+		for _, id := range ids {
+			for _, b := range vocab[id] {
+				tokens = append(tokens, b)
+			}
 		}
+		if len(tokens) == prevLen {
+			break
+		}
+		prevLen = len(tokens)
+		ids = tokens
 	}
-	return string(tokens)
+	out := make([]byte, len(tokens))
+	for i, t := range tokens {
+		out[i] = byte(t)
+	}
+	return string(out)
 }
 
 func toIntSlice(bytes []byte) []int {
