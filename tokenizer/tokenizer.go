@@ -1,17 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
-func findMostCommonPair(tokens []int) [2]int {
+func getStats(tokens []int) map[[2]int]int {
 	counts := make(map[[2]int]int)
-	max := 0
-	var mpair [2]int
 	for i := 0; i < len(tokens)-1; i++ {
 		pair := [2]int{tokens[i], tokens[i+1]}
 		counts[pair]++
+	}
+	return counts
+}
 
-		if counts[pair] > max {
-			max = counts[pair]
+func findMostCommonPair(tokens []int) [2]int {
+	counts := getStats(tokens)
+	max := 0
+	var mpair [2]int
+	for pair, count := range counts {
+		if count > max {
+			max = count
 			mpair = pair
 		}
 	}
@@ -52,6 +61,35 @@ func main() {
 
 	x := decode(ids, vocab)
 	fmt.Println(len(x))
+
+	y := encode("hello world!", merges)
+	fmt.Println(y)
+
+	fmt.Println(text == decode(encode(text, merges), vocab))
+}
+
+func encode(text string, merges map[[2]int]int) []int {
+	tokens := toIntSlice([]byte(text))
+
+	for len(tokens) >= 2 {
+		stats := getStats(tokens)
+		var pair []int = nil
+		min := math.MaxInt
+		for p := range stats {
+			if idx, ok := merges[p]; ok {
+				if idx < min {
+					min = idx
+					pair = p[:]
+				}
+			}
+		}
+		if pair == nil {
+			break
+		}
+		tokens = mergeToken(tokens, [2]int{pair[0], pair[1]}, min)
+	}
+
+	return tokens
 }
 
 func decode(ids []int, vocab map[int][]int) string {
