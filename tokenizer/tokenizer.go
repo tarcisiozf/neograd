@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"regexp"
 )
 
 func getStats(tokens []int) map[[2]int]int {
@@ -66,6 +67,9 @@ func main() {
 	fmt.Println(y)
 
 	fmt.Println(text == decode(encode(text, merges), vocab))
+
+	r := regexp.MustCompile(`'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+`)
+	fmt.Println(r.FindAllString("Hello've world123 how are you!!!?", -1))
 }
 
 func encode(text string, merges map[[2]int]int) []int {
