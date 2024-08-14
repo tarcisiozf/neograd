@@ -37,11 +37,22 @@ func derivReLU(z *matrix.Matrix) *matrix.Matrix {
 	return out
 }
 
-func backProp(z1, a1, z2, a2, w2 *matrix.Matrix, y []float32) {
+func backProp(z1, a1, z2, a2, w2, x *matrix.Matrix, y []float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
 	m := len(y)
 	ohY := matrix.OneHot(y)
 	dz2 := a2.Sub(ohY)
 	dw2 := matrix.Mulf(dz2.Dot(a1.Transpose()), 1/float32(m))
 	db2 := matrix.Mulf(dz2.Sum(2), 1/float32(m)) // TODO: dim of video
 	dz1 := w2.Transpose().Dot(dz2).Mul(derivReLU(z1))
+	dw1 := matrix.Mulf(dz1.Dot(x.Transpose()), 1/float32(m))
+	db1 := matrix.Mulf(dz1.Sum(2), 1/float32(m)) // TODO: dim of video
+	return dw1, db1, dw2, db2
+}
+
+func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 *matrix.Matrix, lr float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
+	w1 = w1.Sub(matrix.Mulf(dw1, lr))
+	b1 = b1.Sub(matrix.Mulf(db1, lr))
+	w2 = w2.Sub(matrix.Mulf(dw2, lr))
+	b2 = b2.Sub(matrix.Mulf(db2, lr))
+	return w1, b1, w2, b2
 }
