@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	gradientDescent(matrix.Random(784, 3), []float32{1, 2, 3}, 1, 0.01)
+	gradientDescent(matrix.Random(784, 3), []float32{1, 2, 9}, 1, 0.01)
 }
 
 func initParams() (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
