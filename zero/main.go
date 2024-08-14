@@ -40,7 +40,7 @@ func main() {
 		X = append(X, pixels)
 	}
 
-	//X_train := matrix.FromSlice(X[:1000]).Transpose() //.Divf(255)
+	X_train := matrix.FromSlice(X[:1000]).Transpose().Divf(255)
 	//Y_train := Y[:1000]
 
 	//gradientDescent(X_train, Y_train, 1000, 0.1)
@@ -51,13 +51,16 @@ func main() {
 		panic(err)
 	}
 	foo := matrix.FromSlice(baz).Divf(255)
-
-	//foo := X_train.Col(0)
 	plotImage(foo)
+
+	foo2 := X_train.Col(0)
+	plotImage(foo2)
 	w1, b1, w2, b2 := loadParams()
-	_, _, _, a2 := forwardPass(w1, b1, w2, b2, foo)
+	_, _, _, a2 := forwardPass(w1, b1, w2, b2, foo2)
 	fmt.Println("prediction", prediction(a2))
 	fmt.Println("actual", Y[0])
+
+	//gradientDescent(foo, []float32{Y[0]}, 1, 0.1)
 }
 
 func loadParams() (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
@@ -136,7 +139,7 @@ func forwardPass(w1, b1, w2, b2, X *matrix.Matrix) (*matrix.Matrix, *matrix.Matr
 
 func derivReLU(z *matrix.Matrix) *matrix.Matrix {
 	out := matrix.FromShape(z)
-	v := out.Internal()
+	v := z.Internal()
 	for i := range v {
 		for j := range v[i] {
 			if v[i][j] > 0 {
@@ -147,28 +150,29 @@ func derivReLU(z *matrix.Matrix) *matrix.Matrix {
 	return out
 }
 
-func backProp(z1, a1, z2, a2, w2, x *matrix.Matrix, y []float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
-	m := len(y)
+func backProp(z1, a1, z2, a2, w2, x *matrix.Matrix, y []float32) (*matrix.Matrix, float32, *matrix.Matrix, float32) {
+	m := 42000 // TODO: len(y) + 1000
 	ohY := matrix.OneHot(y)
 	dz2 := a2.Sub(ohY)
 	dw2 := matrix.Mulf(dz2.Dot(a1.Transpose()), 1/float32(m))
-	db2 := matrix.Mulf(dz2.Sum(2), 1/float32(m)) // TODO: dim of video
+	db2 := dz2.Sumf() * (1 / float32(m)) // TODO: e-21 on python
 	dz1 := w2.Transpose().Dot(dz2).Mul(derivReLU(z1))
 	dw1 := matrix.Mulf(dz1.Dot(x.Transpose()), 1/float32(m))
-	db1 := matrix.Mulf(dz1.Sum(2), 1/float32(m)) // TODO: dim of video
+	db1 := dz1.Sumf() * (1 / float32(m)) // TODO: dim of video
 	return dw1, db1, dw2, db2
 }
 
-func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 *matrix.Matrix, lr float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
+func updateParams(w1, b1, w2, b2, dw1 *matrix.Matrix, db1 float32, dw2 *matrix.Matrix, db2 float32, lr float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
 	w1 = w1.Sub(matrix.Mulf(dw1, lr))
-	b1 = b1.Sub(matrix.Mulf(db1, lr))
+	b1 = b1.Subf(db1 * lr)
 	w2 = w2.Sub(matrix.Mulf(dw2, lr))
-	b2 = b2.Sub(matrix.Mulf(db2, lr))
+	b2 = b2.Subf(db2 * lr)
 	return w1, b1, w2, b2
 }
 
 func gradientDescent(x *matrix.Matrix, y []float32, iterations int, lr float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
-	w1, b1, w2, b2 := initParams()
+	//w1, b1, w2, b2 := initParams()
+	w1, b1, w2, b2 := loadParams()
 	for i := 0; i < iterations; i++ {
 		z1, a1, z2, a2 := forwardPass(w1, b1, w2, b2, x)
 		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, x, y)

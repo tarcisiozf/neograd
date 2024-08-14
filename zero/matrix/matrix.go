@@ -153,6 +153,26 @@ func (m *Matrix) Col(idx int) *Matrix {
 	return out
 }
 
+func (m *Matrix) Sumf() float32 {
+	var sum float32
+	for i := range m.s {
+		for j := range m.s[i] {
+			sum += m.s[i][j]
+		}
+	}
+	return sum
+}
+
+func (m *Matrix) Subf(f float32) *Matrix {
+	out := FromShape(m)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] - f
+		}
+	}
+	return out
+}
+
 //func (m *Matrix) Size() int {
 //	return m.rows * m.cols
 //}
@@ -217,7 +237,7 @@ func OneHot(Y []float32) *Matrix {
 			max = Y[i]
 		}
 	}
-	out := New(size, int(max)+1) // TODO: ceil?
+	out := New(size, 10) // int(max)+1) // TODO: ceil?
 	for i := range Y {
 		out.s[i][int(Y[i])] = 1
 	}
