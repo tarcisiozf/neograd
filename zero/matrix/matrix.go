@@ -106,9 +106,9 @@ func (m *Matrix) Sub(b *Matrix) *Matrix {
 	return out
 }
 
-func (m *Matrix) Sum(dim int) *Matrix {
+func (m *Matrix) Sum(axys int) *Matrix {
 	var out *Matrix
-	if dim == 2 {
+	if axys == 2 {
 		out = New(len(m.s), 1)
 		for i := range m.s {
 			for j := range m.s[i] {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"neograd/zero/matrix"
 	"os"
 	"strconv"
@@ -116,13 +117,14 @@ func accuracy(a []float32, b []float32) float32 {
 
 func prediction(m *matrix.Matrix) []float32 {
 	var out []float32
-	for _, row := range m.Internal() {
-		var max float32
+	v := m.Internal()
+	for i := 0; i < len(v[0]); i++ {
+		max := float32(math.Inf(-1))
 		var idx int
-		for i, v := range row {
-			if v > max {
-				max = v
-				idx = i
+		for j := 0; j < len(v); j++ {
+			if v[j][i] > max {
+				max = v[j][i]
+				idx = j
 			}
 		}
 		out = append(out, float32(idx))
