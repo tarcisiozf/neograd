@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-
+	gradientDescent(matrix.Random(784, 3), []float32{1, 2, 3}, 1, 0.01)
 }
 
 func initParams() (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
@@ -54,5 +54,15 @@ func updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2 *matrix.Matrix, lr float32)
 	b1 = b1.Sub(matrix.Mulf(db1, lr))
 	w2 = w2.Sub(matrix.Mulf(dw2, lr))
 	b2 = b2.Sub(matrix.Mulf(db2, lr))
+	return w1, b1, w2, b2
+}
+
+func gradientDescent(x *matrix.Matrix, y []float32, iterations int, lr float32) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
+	w1, b1, w2, b2 := initParams()
+	for i := 0; i < iterations; i++ {
+		z1, a1, z2, a2 := forwardPass(w1, b1, w2, b2, x)
+		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, x, y)
+		w1, b1, w2, b2 = updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2, lr)
+	}
 	return w1, b1, w2, b2
 }
