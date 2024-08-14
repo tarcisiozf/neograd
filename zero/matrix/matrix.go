@@ -93,12 +93,14 @@ func ReLU(m *Matrix) *Matrix {
 
 func Softmax(m *Matrix) *Matrix {
 	out := FromShape(m)
+	sum := float32(0)
 	for i := range out.s {
-		sum := float32(0)
 		for j := range out.s[i] {
 			out.s[i][j] = float32(math.Exp(float64(m.s[i][j])))
 			sum += out.s[i][j]
 		}
+	}
+	for i := range out.s {
 		for j := range out.s[i] {
 			out.s[i][j] /= sum
 		}
