@@ -24,6 +24,7 @@ func forwardPass(w1, b1, w2, b2, X *matrix.Matrix) (*matrix.Matrix, *matrix.Matr
 	return z1, a1, z2, a2
 }
 
-func backProp(z1, a1, z2, a2, w2, y *matrix.Matrix) {
-
+func backProp(z1, a1, z2, a2, w2 *matrix.Matrix, y []float32) {
+	ohY := matrix.OneHot(y)
+	dz2 := a2.Sub(ohY)
 }

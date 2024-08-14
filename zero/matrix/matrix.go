@@ -78,6 +78,20 @@ func (m *Matrix) Transpose() *Matrix {
 	return out
 }
 
+func (m *Matrix) Sub(b *Matrix) *Matrix {
+	if len(m.s) != len(b.s) || len(m.s[0]) != len(b.s[0]) {
+		panic("Matrix dimensions must match")
+	}
+
+	out := New(len(m.s), len(m.s[0]))
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] - b.s[i][j]
+		}
+	}
+	return out
+}
+
 //func (m *Matrix) Size() int {
 //	return m.rows * m.cols
 //}

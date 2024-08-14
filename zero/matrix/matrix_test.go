@@ -96,3 +96,14 @@ func TestOneHot(t *testing.T) {
 		t.Errorf("One-hot failed")
 	}
 }
+
+func TestMatrix_Sub(t *testing.T) {
+	a := matrix.FromSlice([][]float32{
+		{1, 2},
+		{3, 4},
+	})
+	c := a.Sub(a).Internal()
+	if c[0][0] != 0 || c[0][1] != 0 || c[1][0] != 0 || c[1][1] != 0 {
+		t.Errorf("Matrix subtraction failed")
+	}
+}
