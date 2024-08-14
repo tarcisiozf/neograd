@@ -135,6 +135,24 @@ func (m *Matrix) Mul(b *Matrix) *Matrix {
 	return out
 }
 
+func (m *Matrix) Divf(f float32) *Matrix {
+	out := FromShape(m)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] / f
+		}
+	}
+	return out
+}
+
+func (m *Matrix) Col(idx int) *Matrix {
+	out := New(m.rows, 1)
+	for i := range out.s {
+		out.s[i][0] = m.s[i][idx]
+	}
+	return out
+}
+
 //func (m *Matrix) Size() int {
 //	return m.rows * m.cols
 //}
