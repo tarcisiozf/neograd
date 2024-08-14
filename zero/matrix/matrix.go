@@ -68,6 +68,32 @@ func (m *Matrix) Internal() [][]float32 {
 	return m.s
 }
 
+func (m *Matrix) Transpose() *Matrix {
+	out := New(m.cols, m.rows)
+	for i := range m.s {
+		for j := range m.s[i] {
+			out.s[j][i] = m.s[i][j]
+		}
+	}
+	return out
+}
+
+//func (m *Matrix) Size() int {
+//	return m.rows * m.cols
+//}
+//
+//func (m *Matrix) Max() float32 {
+//	max := float32(math.Inf(-1))
+//	for i := range m.s {
+//		for j := range m.s[i] {
+//			if m.s[i][j] > max {
+//				max = m.s[i][j]
+//			}
+//		}
+//	}
+//	return max
+//}
+
 func Random(rows int, cols int) *Matrix {
 	out := New(rows, cols)
 	for i := range out.s {
@@ -106,4 +132,19 @@ func Softmax(m *Matrix) *Matrix {
 		}
 	}
 	return out
+}
+
+func OneHot(Y []float32) *Matrix {
+	size := len(Y)
+	max := float32(math.Inf(-1))
+	for i := range Y {
+		if Y[i] > max {
+			max = Y[i]
+		}
+	}
+	out := New(size, int(max)+1) // TODO: ceil?
+	for i := range Y {
+		out.s[i][int(Y[i])] = 1
+	}
+	return out.Transpose()
 }

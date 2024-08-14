@@ -68,3 +68,31 @@ func TestSoftmax(t *testing.T) {
 		t.Errorf("Softmax failed")
 	}
 }
+
+func TestMatrix_Transpose(t *testing.T) {
+	a := matrix.FromSlice([][]float32{
+		{1, 2},
+		{3, 4},
+	})
+	b := a.Transpose().Internal()
+	if b[0][0] != 1 || b[0][1] != 3 || b[1][0] != 2 || b[1][1] != 4 {
+		t.Errorf("Matrix transpose failed")
+	}
+}
+
+func TestOneHot(t *testing.T) {
+	a := []float32{1, 0, 3}
+	b := matrix.OneHot(a).Internal()
+	if b[0][0] != 0 || b[0][1] != 1 || b[0][2] != 0 {
+		t.Errorf("One-hot failed")
+	}
+	if b[1][0] != 1 || b[1][1] != 0 || b[1][2] != 0 {
+		t.Errorf("One-hot failed")
+	}
+	if b[2][0] != 0 || b[2][1] != 0 || b[2][2] != 0 {
+		t.Errorf("One-hot failed")
+	}
+	if b[3][0] != 0 || b[3][1] != 0 || b[3][2] != 1 {
+		t.Errorf("One-hot failed")
+	}
+}
