@@ -1,11 +1,44 @@
 package main
 
 import (
+	"fmt"
 	"neograd/zero/matrix"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
-	gradientDescent(matrix.Random(784, 3), []float32{1, 2, 9}, 1, 0.01)
+	var X [][]float32
+	var Y []float32
+
+	file, err := os.ReadFile("./scratch/train.csv")
+	if err != nil {
+		panic(err)
+	}
+	csv := strings.Split(string(file), "\n")
+	for _, row := range csv[1:] {
+		if row == "" {
+			continue
+		}
+		cols := strings.Split(row, ",")
+		label, err := strconv.Atoi(cols[0])
+		if err != nil {
+			panic(err)
+		}
+		Y = append(Y, float32(label))
+		pixels := make([]float32, 784)
+		for i, col := range cols[1:] {
+			p := col[0] - '0'
+			pixels[i] = float32(p)
+		}
+		X = append(X, pixels)
+	}
+
+	X_train := matrix.FromSlice(X[:1000]).Transpose()
+	Y_train := Y[:1000]
+
+	gradientDescent(X_train, Y_train, 500, 0.1)
 }
 
 func initParams() (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
@@ -63,6 +96,36 @@ func gradientDescent(x *matrix.Matrix, y []float32, iterations int, lr float32) 
 		z1, a1, z2, a2 := forwardPass(w1, b1, w2, b2, x)
 		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, x, y)
 		w1, b1, w2, b2 = updateParams(w1, b1, w2, b2, dw1, db1, dw2, db2, lr)
+		if i%50 == 0 || i == iterations-1 {
+			fmt.Println("Iteration", i)
+			fmt.Println("Accuracy", accuracy(prediction(a2), y))
+		}
 	}
 	return w1, b1, w2, b2
+}
+
+func accuracy(a []float32, b []float32) float32 {
+	correct := 0
+	for i := range a {
+		if a[i] == b[i] {
+			correct++
+		}
+	}
+	return float32(correct) / float32(len(a))
+}
+
+func prediction(m *matrix.Matrix) []float32 {
+	var out []float32
+	for _, row := range m.Internal() {
+		var max float32
+		var idx int
+		for i, v := range row {
+			if v > max {
+				max = v
+				idx = i
+			}
+		}
+		out = append(out, float32(idx))
+	}
+	return out
 }
