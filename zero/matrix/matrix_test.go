@@ -107,3 +107,25 @@ func TestMatrix_Sub(t *testing.T) {
 		t.Errorf("Matrix subtraction failed")
 	}
 }
+
+func TestMulf(t *testing.T) {
+	a := matrix.FromSlice([][]float32{
+		{1, 2},
+		{3, 4},
+	})
+	b := matrix.Mulf(a, 2).Internal()
+	if b[0][0] != 2 || b[0][1] != 4 || b[1][0] != 6 || b[1][1] != 8 {
+		t.Errorf("Matrix multiplication failed")
+	}
+}
+
+func TestMatrix_Mul(t *testing.T) {
+	a := matrix.FromSlice([][]float32{
+		{1, 2},
+		{3, 4},
+	})
+	c := a.Mul(a).Internal()
+	if c[0][0] != 1 || c[0][1] != 4 || c[1][0] != 9 || c[1][1] != 16 {
+		t.Errorf("Matrix element-wise multiplication failed")
+	}
+}

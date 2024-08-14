@@ -92,6 +92,35 @@ func (m *Matrix) Sub(b *Matrix) *Matrix {
 	return out
 }
 
+func (m *Matrix) Sum(dim int) *Matrix {
+	var out *Matrix
+	if dim == 2 {
+		out = New(len(m.s), 1)
+		for i := range m.s {
+			for j := range m.s[i] {
+				out.s[i][0] += m.s[i][j]
+			}
+		}
+	} else {
+		panic("Not implemented")
+	}
+	return out
+}
+
+func (m *Matrix) Set(y int, x int, v float32) {
+	m.s[y][x] = v
+}
+
+func (m *Matrix) Mul(b *Matrix) *Matrix {
+	out := FromShape(m)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] * b.s[i][j]
+		}
+	}
+	return out
+}
+
 //func (m *Matrix) Size() int {
 //	return m.rows * m.cols
 //}
@@ -161,4 +190,14 @@ func OneHot(Y []float32) *Matrix {
 		out.s[i][int(Y[i])] = 1
 	}
 	return out.Transpose()
+}
+
+func Mulf(m *Matrix, f float32) *Matrix {
+	out := FromShape(m)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] * f
+		}
+	}
+	return out
 }
