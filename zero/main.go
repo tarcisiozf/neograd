@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"neograd/zero/matrix"
@@ -43,10 +44,22 @@ func main() {
 }
 
 func initParams() (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
-	w1 := matrix.Random(10, 784)
-	b1 := matrix.Random(10, 1)
-	w2 := matrix.Random(10, 10)
-	b2 := matrix.Random(10, 1)
+	//w1 := matrix.Random(10, 784)
+	//b1 := matrix.Random(10, 1)
+	//w2 := matrix.Random(10, 10)
+	//b2 := matrix.Random(10, 1)
+	file, err := os.ReadFile("./zero/params.json")
+	if err != nil {
+		panic(err)
+	}
+	var params map[string][][]float32
+	if err := json.Unmarshal(file, &params); err != nil {
+		panic(err)
+	}
+	w1 := matrix.FromSlice(params["w1"])
+	b1 := matrix.FromSlice(params["b1"])
+	w2 := matrix.FromSlice(params["w2"])
+	b2 := matrix.FromSlice(params["b2"])
 	return w1, b1, w2, b2
 }
 
