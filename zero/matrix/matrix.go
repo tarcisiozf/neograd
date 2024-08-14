@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -52,7 +53,7 @@ func (m *Matrix) Dot(b *Matrix) *Matrix {
 
 func (m *Matrix) Add(b *Matrix) *Matrix {
 	if len(m.s) != len(b.s) || len(m.s[0]) != len(b.s[0]) {
-		panic("Matrix dimensions must match")
+		b = broadcast(m, b)
 	}
 
 	out := New(len(m.s), len(m.s[0]))
@@ -62,6 +63,19 @@ func (m *Matrix) Add(b *Matrix) *Matrix {
 		}
 	}
 	return out
+}
+
+func broadcast(m *Matrix, b *Matrix) *Matrix {
+	if m.rows == b.rows && m.cols > b.cols {
+		out := New(b.rows, m.cols)
+		for i := range out.s {
+			for j := range out.s[i] {
+				out.s[i][j] = b.s[i][0]
+			}
+		}
+		return out
+	}
+	panic(fmt.Sprintf("Failed to broadcast shapes (%d, %d) and (%d, %d)", m.rows, m.cols, b.rows, b.cols))
 }
 
 func (m *Matrix) Internal() [][]float32 {
