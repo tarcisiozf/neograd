@@ -107,20 +107,20 @@ func (m *Matrix) Sub(b *Matrix) *Matrix {
 	return out
 }
 
-func (m *Matrix) Sum(axys int) *Matrix {
-	var out *Matrix
-	if axys == 2 {
-		out = New(len(m.s), 1)
-		for i := range m.s {
-			for j := range m.s[i] {
-				out.s[i][0] += m.s[i][j]
-			}
-		}
-	} else {
-		panic("Not implemented")
-	}
-	return out
-}
+//func (m *Matrix) Sum(axys int) *Matrix {
+//	var out *Matrix
+//	if axys == 2 {
+//		out = New(len(m.s), 1)
+//		for i := range m.s {
+//			for j := range m.s[i] {
+//				out.s[i][0] += m.s[i][j]
+//			}
+//		}
+//	} else {
+//		panic("Not implemented")
+//	}
+//	return out
+//}
 
 func (m *Matrix) Set(y int, x int, v float64) {
 	m.s[y][x] = v
@@ -208,7 +208,7 @@ func Softmax(m *Matrix) *Matrix {
 	sum := float64(0)
 	for i := range out.s {
 		for j := range out.s[i] {
-			out.s[i][j] = float64(math.Exp(float64(m.s[i][j])))
+			out.s[i][j] = math.Exp(m.s[i][j])
 			sum += out.s[i][j]
 		}
 	}
