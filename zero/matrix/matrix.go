@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -171,6 +172,12 @@ func (m *Matrix) Subf(f float32) *Matrix {
 		}
 	}
 	return out
+}
+
+func (m *Matrix) Dump() {
+	if bytes, err := json.Marshal(m.s); err == nil {
+		fmt.Println(string(bytes))
+	}
 }
 
 //func (m *Matrix) Size() int {
