@@ -8,14 +8,14 @@ import (
 )
 
 type Matrix struct {
-	s          [][]float32
+	s          [][]float64
 	rows, cols int
 }
 
 func New(rows int, cols int) *Matrix {
-	out := make([][]float32, rows)
+	out := make([][]float64, rows)
 	for i := range out {
-		out[i] = make([]float32, cols)
+		out[i] = make([]float64, cols)
 	}
 	return &Matrix{
 		s:    out,
@@ -28,7 +28,7 @@ func FromShape(m *Matrix) *Matrix {
 	return New(m.rows, m.cols)
 }
 
-func FromSlice(s [][]float32) *Matrix {
+func FromSlice(s [][]float64) *Matrix {
 	return &Matrix{
 		s:    s,
 		rows: len(s),
@@ -79,7 +79,7 @@ func broadcast(m *Matrix, b *Matrix) *Matrix {
 	panic(fmt.Sprintf("Failed to broadcast shapes (%d, %d) and (%d, %d)", m.rows, m.cols, b.rows, b.cols))
 }
 
-func (m *Matrix) Internal() [][]float32 {
+func (m *Matrix) Internal() [][]float64 {
 	return m.s
 }
 
@@ -122,7 +122,7 @@ func (m *Matrix) Sum(axys int) *Matrix {
 	return out
 }
 
-func (m *Matrix) Set(y int, x int, v float32) {
+func (m *Matrix) Set(y int, x int, v float64) {
 	m.s[y][x] = v
 }
 
@@ -136,7 +136,7 @@ func (m *Matrix) Mul(b *Matrix) *Matrix {
 	return out
 }
 
-func (m *Matrix) Divf(f float32) *Matrix {
+func (m *Matrix) Divf(f float64) *Matrix {
 	out := FromShape(m)
 	for i := range out.s {
 		for j := range out.s[i] {
@@ -154,8 +154,8 @@ func (m *Matrix) Col(idx int) *Matrix {
 	return out
 }
 
-func (m *Matrix) Sumf() float32 {
-	var sum float32
+func (m *Matrix) Sumf() float64 {
+	var sum float64
 	for i := range m.s {
 		for j := range m.s[i] {
 			sum += m.s[i][j]
@@ -164,7 +164,7 @@ func (m *Matrix) Sumf() float32 {
 	return sum
 }
 
-func (m *Matrix) Subf(f float32) *Matrix {
+func (m *Matrix) Subf(f float64) *Matrix {
 	out := FromShape(m)
 	for i := range out.s {
 		for j := range out.s[i] {
@@ -180,28 +180,12 @@ func (m *Matrix) Dump() {
 	}
 }
 
-//func (m *Matrix) Size() int {
-//	return m.rows * m.cols
-//}
-//
-//func (m *Matrix) Max() float32 {
-//	max := float32(math.Inf(-1))
-//	for i := range m.s {
-//		for j := range m.s[i] {
-//			if m.s[i][j] > max {
-//				max = m.s[i][j]
-//			}
-//		}
-//	}
-//	return max
-//}
-
 func Random(rows int, cols int) *Matrix {
 	out := New(rows, cols)
 	for i := range out.s {
-		out.s[i] = make([]float32, cols)
+		out.s[i] = make([]float64, cols)
 		for j := range out.s[i] {
-			out.s[i][j] = rand.Float32() - 0.5
+			out.s[i][j] = rand.Float64() - 0.5
 		}
 	}
 	return out
@@ -221,10 +205,10 @@ func ReLU(m *Matrix) *Matrix {
 
 func Softmax(m *Matrix) *Matrix {
 	out := FromShape(m)
-	sum := float32(0)
+	sum := float64(0)
 	for i := range out.s {
 		for j := range out.s[i] {
-			out.s[i][j] = float32(math.Exp(float64(m.s[i][j])))
+			out.s[i][j] = float64(math.Exp(float64(m.s[i][j])))
 			sum += out.s[i][j]
 		}
 	}
@@ -236,9 +220,9 @@ func Softmax(m *Matrix) *Matrix {
 	return out
 }
 
-func OneHot(Y []float32) *Matrix {
+func OneHot(Y []float64) *Matrix {
 	size := len(Y)
-	max := float32(math.Inf(-1))
+	max := float64(math.Inf(-1))
 	for i := range Y {
 		if Y[i] > max {
 			max = Y[i]
@@ -251,7 +235,7 @@ func OneHot(Y []float32) *Matrix {
 	return out.Transpose()
 }
 
-func Mulf(m *Matrix, f float32) *Matrix {
+func Mulf(m *Matrix, f float64) *Matrix {
 	out := FromShape(m)
 	for i := range out.s {
 		for j := range out.s[i] {
