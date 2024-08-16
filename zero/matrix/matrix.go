@@ -154,6 +154,16 @@ func (m *Matrix) Col(idx int) *Matrix {
 	return out
 }
 
+func (m *Matrix) Cols(num int) *Matrix {
+	out := New(m.rows, num)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j]
+		}
+	}
+	return out
+}
+
 func (m *Matrix) Sumf() float64 {
 	var sum float64
 	for i := range m.s {

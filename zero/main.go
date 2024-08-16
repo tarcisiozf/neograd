@@ -14,6 +14,28 @@ import (
 	"strings"
 )
 
+type MemState struct {
+	X   [][]float64 `json:"X"`
+	Y   []float64   `json:"Y"`
+	Z1  [][]float64 `json:"Z1"`
+	A1  [][]float64 `json:"A1"`
+	Z2  [][]float64 `json:"Z2"`
+	A2  [][]float64 `json:"A2"`
+	OhY [][]float64 `json:"ohY"`
+	DZ2 [][]float64 `json:"dZ2"`
+	DW2 [][]float64 `json:"dW2"`
+	Db2 float64     `json:"db2"`
+	DZ1 [][]float64 `json:"dZ1"`
+	DW1 [][]float64 `json:"dW1"`
+	Db1 float64     `json:"db1"`
+	W1  [][]float64 `json:"W1"`
+	B1  [][]float64 `json:"b1"`
+	W2  [][]float64 `json:"W2"`
+	B2  [][]float64 `json:"b2"`
+}
+
+var memState = MemState{}
+
 func main() {
 	var X [][]float64
 	var Y []float64
@@ -60,14 +82,26 @@ func main() {
 	//foo := matrix.FromSlice(baz).Divf(255)
 	//plotImage(foo)
 
-	foo := X_train.Col(0)
+	//foo := X_train.Col(0)
 	//plotImage(foo)
 	//w1, b1, w2, b2 := loadParams()
 	//_, _, _, a2 := forwardPass(w1, b1, w2, b2, foo2)
 	//fmt.Println("prediction", prediction(a2))
 	//fmt.Println("actual", Y[0])
 
-	gradientDescent(foo, []float64{Y[0]}, 1, 0.1)
+	//gradientDescent(foo, []float64{Y[0]}, 100, 0.1)
+	gradientDescent(X_train.Cols(10), slice(Y, 10), 1, 0.1)
+
+	dump, _ := json.Marshal(memState)
+	_ = os.WriteFile("go-compare.json", dump, 0644)
+}
+
+func slice(y []float64, i int) []float64 {
+	var out []float64
+	for j := 0; j < i; j++ {
+		out = append(out, y[j])
+	}
+	return out
 }
 
 func convertPretrained() {
@@ -205,6 +239,12 @@ func forwardPass(w1, b1, w2, b2, X *matrix.Matrix) (*matrix.Matrix, *matrix.Matr
 	a1 := matrix.ReLU(z1)
 	z2 := w2.Dot(a1).Add(b2)
 	a2 := matrix.Softmax(z2)
+
+	memState.Z1 = z1.Internal()
+	memState.A1 = a1.Internal()
+	memState.Z2 = z2.Internal()
+	memState.A2 = a2.Internal()
+
 	return z1, a1, z2, a2
 }
 
@@ -227,10 +267,19 @@ func backProp(z1, a1, z2, a2, w2, x *matrix.Matrix, y []float64) (*matrix.Matrix
 	dz2 := a2.Sub(ohY)
 	dw2 := matrix.Mulf(dz2.Dot(a1.Transpose()), 1/float64(m))
 	db2 := dz2.Sumf() * (1 / float64(m))
-	//dz2.Dump()
 	dz1 := w2.Transpose().Dot(dz2).Mul(derivReLU(z1))
 	dw1 := matrix.Mulf(dz1.Dot(x.Transpose()), 1/float64(m))
 	db1 := dz1.Sumf() * (1 / float64(m))
+
+	memState.OhY = ohY.Internal()
+	memState.A2 = a2.Internal()
+	memState.DZ2 = dz2.Internal()
+	memState.DW2 = dw2.Internal()
+	memState.Db2 = db2
+	memState.DZ1 = dz1.Internal()
+	memState.DW1 = dw1.Internal()
+	memState.Db1 = db1
+
 	return dw1, db1, dw2, db2
 }
 
@@ -239,12 +288,20 @@ func updateParams(w1, b1, w2, b2, dw1 *matrix.Matrix, db1 float64, dw2 *matrix.M
 	b1 = b1.Subf(db1 * lr)
 	w2 = w2.Sub(matrix.Mulf(dw2, lr))
 	b2 = b2.Subf(db2 * lr)
+
+	memState.W1 = w1.Internal()
+	memState.B1 = b1.Internal()
+	memState.W2 = w2.Internal()
+	memState.B2 = b2.Internal()
+
 	return w1, b1, w2, b2
 }
 
 func gradientDescent(x *matrix.Matrix, y []float64, iterations int, lr float64) (*matrix.Matrix, *matrix.Matrix, *matrix.Matrix, *matrix.Matrix) {
-	w1, b1, w2, b2 := initParams()
-	//w1, b1, w2, b2 := loadParams()
+	//w1, b1, w2, b2 := initParams()
+	w1, b1, w2, b2 := loadParams()
+	memState.X = x.Internal()
+	memState.Y = y
 	for i := 0; i < iterations; i++ {
 		z1, a1, z2, a2 := forwardPass(w1, b1, w2, b2, x)
 		dw1, db1, dw2, db2 := backProp(z1, a1, z2, a2, w2, x, y)
