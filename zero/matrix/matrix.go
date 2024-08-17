@@ -76,6 +76,15 @@ func broadcast(m *Matrix, b *Matrix) *Matrix {
 		}
 		return out
 	}
+	if m.rows > b.rows && m.cols == b.cols {
+		out := New(m.rows, b.cols)
+		for i := range out.s {
+			for j := range out.s[i] {
+				out.s[i][j] = b.s[0][j]
+			}
+		}
+		return out
+	}
 	panic(fmt.Sprintf("Failed to broadcast shapes (%d, %d) and (%d, %d)", m.rows, m.cols, b.rows, b.cols))
 }
 
@@ -131,6 +140,20 @@ func (m *Matrix) Mul(b *Matrix) *Matrix {
 	for i := range out.s {
 		for j := range out.s[i] {
 			out.s[i][j] = m.s[i][j] * b.s[i][j]
+		}
+	}
+	return out
+}
+
+func (m *Matrix) Div(b *Matrix) *Matrix {
+	if m.rows != b.rows || m.cols != b.cols {
+		b = broadcast(m, b)
+	}
+
+	out := FromShape(m)
+	for i := range out.s {
+		for j := range out.s[i] {
+			out.s[i][j] = m.s[i][j] / b.s[i][j]
 		}
 	}
 	return out
@@ -215,19 +238,14 @@ func ReLU(m *Matrix) *Matrix {
 
 func Softmax(m *Matrix) *Matrix {
 	out := FromShape(m)
-	sum := float64(0)
+	sum := New(1, m.cols)
 	for i := range out.s {
 		for j := range out.s[i] {
 			out.s[i][j] = math.Exp(m.s[i][j])
-			sum += out.s[i][j]
+			sum.s[0][j] += out.s[i][j]
 		}
 	}
-	for i := range out.s {
-		for j := range out.s[i] {
-			out.s[i][j] /= sum
-		}
-	}
-	return out
+	return out.Div(sum)
 }
 
 func OneHot(Y []float64) *Matrix {
