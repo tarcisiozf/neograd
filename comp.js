@@ -14,7 +14,7 @@ function eq(a, b) {
         c++
     }
     let y = Math.abs(b) * Math.pow(10, c)
-    return x.toFixed(4) === y.toFixed(4)
+    return x.toFixed(5) === y.toFixed(5)
 }
 
 function comp(a, b) {
