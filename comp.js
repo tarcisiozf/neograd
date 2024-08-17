@@ -10,9 +10,6 @@ function eq(a, b) {
     let x = Math.abs(a)
     let c = 0
     while (x < 1) {
-        if ((x*10) === Infinity) {
-            break
-        }
         x = x * 10
         c++
     }
@@ -54,7 +51,7 @@ function foo(a, b) {
 }
 
 // INPUT
-console.log('X', foo(p.X, g.X))
+console.log('X', comp(p.X, g.X))
 console.log('Y', foo(p.Y, g.Y))
 
 // FORWARD
