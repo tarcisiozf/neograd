@@ -66,29 +66,36 @@ const pipeline = (...steps) => {
     }
 }
 
-pipeline(
-    // INPUT
-    run('X', () => comp(p.X, g.X)),
-    run('Y', () => foo(p.Y, g.Y)),
+if (require.main === module) {
+    pipeline(
+        // INPUT
+        run('X', () => comp(p.X, g.X)),
+        run('Y', () => foo(p.Y, g.Y)),
 
-    // FORWARD
-    run('Z1', () => comp(p.Z1, g.Z1)),
-    run('A1', () => comp(p.A1, g.A1)),
-    run('Z2', () => comp(p.Z2, g.Z2)),
-    run('A2', () => comp(p.A2, g.A2)),
+        // FORWARD
+        run('Z1', () => comp(p.Z1, g.Z1)),
+        run('A1', () => comp(p.A1, g.A1)),
+        run('Z2', () => comp(p.Z2, g.Z2)),
+        run('A2', () => comp(p.A2, g.A2)),
 
-    // BACKWARD
-    run('ohY', () => comp(p.ohY, g.ohY)),
-    run('dZ2', () => comp(p.dZ2, g.dZ2)),
-    run('dW2', () => comp(p.dW2, g.dW2)),
-    run('db2', () => eq(p.db2, g.db2), p.db2, g.db2),
-    run('dZ1', () => comp(p.dZ1, g.dZ1)),
-    run('dW1', () => comp(p.dW1, g.dW1)),
-    run('db1', () => eq(p.db1, g.db1)),
+        // BACKWARD
+        run('ohY', () => comp(p.ohY, g.ohY)),
+        run('dZ2', () => comp(p.dZ2, g.dZ2)),
+        run('dW2', () => comp(p.dW2, g.dW2)),
+        run('db2', () => eq(p.db2, g.db2), p.db2, g.db2),
+        run('dZ1', () => comp(p.dZ1, g.dZ1)),
+        run('dW1', () => comp(p.dW1, g.dW1)),
+        run('db1', () => eq(p.db1, g.db1)),
 
-    // UPDATE
-    run('W1', () => comp(p.W1, g.W1)),
-    run('b1', () => comp(p.b1, g.b1)),
-    run('W2', () => comp(p.W2, g.W2)),
-    run('b2', () => comp(p.b2, g.b2)),
-)
+        // UPDATE
+        run('W1', () => comp(p.W1, g.W1)),
+        run('b1', () => comp(p.b1, g.b1)),
+        run('W2', () => comp(p.W2, g.W2)),
+        run('b2', () => comp(p.b2, g.b2)),
+    )
+}
+
+module.exports = {
+    comp,
+    eq
+}
