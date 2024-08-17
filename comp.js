@@ -1,7 +1,8 @@
 const fs = require('fs')
 
 const p = JSON.parse(fs.readFileSync('compare.json', 'utf8'))
-const g = JSON.parse(fs.readFileSync('go-compare.json', 'utf8'))
+// const g = JSON.parse(fs.readFileSync('go-compare.json', 'utf8'))
+const g = JSON.parse(fs.readFileSync('c-compare.json', 'utf8'))
 
 function eq(a, b) {
     if (a === 0) {
@@ -19,9 +20,11 @@ function eq(a, b) {
 
 function comp(a, b) {
     if (a.length !== b.length) {
+        console.log(`length ${a.length} != ${b.length}`)
         return false
     }
     if (a[0].length !== b[0].length) {
+        console.log(`col length ${a[0].length} != ${b[0].length}`)
         return false
     }
 
@@ -39,6 +42,7 @@ function comp(a, b) {
 
 function foo(a, b) {
     if (a.length !== b.length) {
+        console.log(`length ${a.length} != ${b.length}`)
         return false
     }
     for (let i = 0; i < a.length; i++) {
@@ -50,27 +54,41 @@ function foo(a, b) {
     return true
 }
 
-// INPUT
-console.log('X', comp(p.X, g.X))
-console.log('Y', foo(p.Y, g.Y))
+const run = (name, fn) => {
+    return { name, fn }
+}
 
-// FORWARD
-console.log('Z1', comp(p.Z1, g.Z1))
-console.log('A1', comp(p.A1, g.A1))
-console.log('Z2', comp(p.Z2, g.Z2))
-console.log('A2', comp(p.A2, g.A2))
+const pipeline = (...steps) => {
+    for (const { name, fn } of steps) {
+        const result = fn()
+        console.log(name, result)
+        if (!result) break
+    }
+}
 
-// BACKWARD
-console.log('ohY', comp(p.ohY, g.ohY))
-console.log('dZ2', comp(p.dZ2, g.dZ2))
-console.log('dW2', comp(p.dW2, g.dW2))
-console.log('db2', eq(p.db2, g.db2), p.db2, g.db2)
-console.log('dZ1', comp(p.dZ1, g.dZ1))
-console.log('dW1', comp(p.dW1, g.dW1))
-console.log('db1', eq(p.db1, g.db1))
+pipeline(
+    // INPUT
+    run('X', () => comp(p.X, g.X)),
+    run('Y', () => foo(p.Y, g.Y)),
 
-// UPDATE
-console.log('W1', comp(p.W1, g.W1))
-console.log('b1', comp(p.b1, g.b1))
-console.log('W2', comp(p.W2, g.W2))
-console.log('b2', comp(p.b2, g.b2))
+    // FORWARD
+    run('Z1', () => comp(p.Z1, g.Z1)),
+    run('A1', () => comp(p.A1, g.A1)),
+    run('Z2', () => comp(p.Z2, g.Z2)),
+    run('A2', () => comp(p.A2, g.A2)),
+
+    // BACKWARD
+    run('ohY', () => comp(p.ohY, g.ohY)),
+    run('dZ2', () => comp(p.dZ2, g.dZ2)),
+    run('dW2', () => comp(p.dW2, g.dW2)),
+    run('db2', () => eq(p.db2, g.db2), p.db2, g.db2),
+    run('dZ1', () => comp(p.dZ1, g.dZ1)),
+    run('dW1', () => comp(p.dW1, g.dW1)),
+    run('db1', () => eq(p.db1, g.db1)),
+
+    // UPDATE
+    run('W1', () => comp(p.W1, g.W1)),
+    run('b1', () => comp(p.b1, g.b1)),
+    run('W2', () => comp(p.W2, g.W2)),
+    run('b2', () => comp(p.b2, g.b2)),
+)
