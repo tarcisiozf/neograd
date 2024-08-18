@@ -54,15 +54,15 @@ function foo(a, b) {
     return true
 }
 
-const run = (name, fn) => {
-    return { name, fn }
+const run = (name, fn, ...printArgs) => {
+    return { name, fn, printArgs }
 }
 
 const pipeline = (...steps) => {
-    for (const { name, fn } of steps) {
+    for (const { name, fn, printArgs } of steps) {
         const result = fn()
-        console.log(name, result)
-        if (!result) break
+        console.log(name, result, ...printArgs)
+        // if (!result) break
     }
 }
 
